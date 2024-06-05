@@ -1,0 +1,27 @@
+{{- if .Values.karpenter.enabled }}
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: {{ include "golden-chart.fullname" . }}
+spec:
+  {{- with .Values.karpenter.disruption }}
+  disruption:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.karpenter.limits }}
+  limits:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    {{- with .Values.karpenter.metadata }}
+    metadata:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    spec:
+      nodeClassRef:
+        name: {{ default "default" .Values.karpenter.nodeClassRef }}
+      {{- with .Values.karpenter.requirements }}
+      requirements:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
